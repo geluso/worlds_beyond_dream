@@ -17,5 +17,6 @@ app.post('/voice', (req, res) => {
   res.end(twiml.toString());
 });
 
-app.listen(3000, () => console.log('Listening at http://localhost:3000'));
+const port = process.env.PORT;
+app.listen(port, () => console.log('Listening at http://localhost:3000'));
 
