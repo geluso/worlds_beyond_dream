@@ -1,20 +1,39 @@
 const express = require('express');
+const twilio = require('twilio');
+const urlencoded = require('body-parser').urlencoded;
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
-let app = express();
+const app = express();
 
-app.post('/voice', (req, res) => {
-  // Set the url of the song we are going to play
-  let songUrl = 'http://5tephen.com/owen/mp3real/menu.mp3'
+// Parse incoming POST params with Express middleware
+app.use(urlencoded({ extended: false }));
 
+app.post('/voice', (request, response) => {
+  // Use the Twilio Node.js SDK to build an XML response
   const twiml = new VoiceResponse();
 
-  twiml.play({
+  // If the user entered digits, process their request
+  const digit = request.body.Digits
+  let songUrl = 'http://5tephen.com/owen/mp3real/'
+  if (digit) {
+    songUrl += digit + '.mp3'
+  } else {
+    songUrl += 'menu.mp3'
+  }
+
+  const gather = twiml.gather({
+    numDigits: 1,
+  });
+
+  gather.play({
     loop: 1
   }, songUrl);
 
-  res.writeHead(200, { 'Content-Type': 'text/xml' });
-  res.end(twiml.toString());
+  twiml.redirect('/voice');
+
+  // // Render the response as XML in reply to the webhook request
+  response.type('text/xml');
+  response.send(twiml.toString());
 });
 
 let port = process.env.PORT || 3000;
