@@ -65,28 +65,29 @@ app.post('/voice', (request, response) => {
   // If the user entered digits, process their request
   const digit = request.body.Digits
 
-  if (IS_CONTEST_ENABLED && digit == 9) {
+  if (IS_CONTEST_ENABLED) {
     console.log('caller number!');
-    incrementCallerNumber(twiml);
-  } else {
-    console.log('play menu');
-    let songUrl = 'http://5tephen.com/owen/mp3real/'
-    if (digit) {
-      songUrl += digit + '.mp3'
-    } else {
-      songUrl += 'menu.mp3'
-    }
-
-    const gather = twiml.gather({
-      numDigits: 1,
-    });
-
-    gather.play({
-      loop: 1
-    }, songUrl);
-
-    twiml.redirect('/voice');
+    const isWinner = incrementCallerNumber(twiml);
+    if (isWinner) return
   }
+  
+  console.log('play menu');
+  let songUrl = 'http://5tephen.com/owen/mp3real/'
+  if (digit) {
+    songUrl += digit + '.mp3'
+  } else {
+    songUrl += 'menu.mp3'
+  }
+
+  const gather = twiml.gather({
+    numDigits: 1,
+  });
+
+  gather.play({
+    loop: 1
+  }, songUrl);
+
+  twiml.redirect('/voice');
 
   // // Render the response as XML in reply to the webhook request
   response.type('text/xml');
@@ -99,12 +100,15 @@ function incrementCallerNumber(twiml) {
   
   if (CALLER_NUMBER === CALLER_WIN_NUMBER) {
     twiml.say('Congratulations! You are lucky caller number ' + CALLER_NUMBER + '. You won!')
+    twiml.say('Stay on the line and you\'ll be connected to an operator to collect your information');
     twiml.dial(OPERATOR_NUMBER)
+    return true
   } else if (CALLER_NUMBER < CALLER_WIN_NUMBER) {
     twiml.say('You are caller number ' + CALLER_NUMBER + '. try calling again!')
   } else {
     twiml.say('The contest has ended! You are caller number ' + CALLER_NUMBER)
   }
+  return false
 }
 
 let port = process.env.PORT || 3000;
