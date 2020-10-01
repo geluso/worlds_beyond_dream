@@ -8,7 +8,7 @@ const app = express();
 let IS_CONTEST_ENABLED = false;
 let CALLER_NUMBER = 0;
 let CALLER_WIN_NUMBER = 5;
-let OPERATOR_NUMBER = '206-659-9994'
+let OPERATOR_NUMBER = '15096389326'
 let IS_WINNER_DECLARED = false;
 
 // Parse incoming POST params with Express middleware
