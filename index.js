@@ -68,7 +68,12 @@ app.post('/voice', (request, response) => {
   if (IS_CONTEST_ENABLED) {
     console.log('caller number!');
     const isWinner = incrementCallerNumber(twiml);
-    if (isWinner) return
+    if (isWinner) {
+      // // Render the response as XML in reply to the webhook request
+      response.type('text/xml');
+      response.send(twiml.toString());
+      return
+    }
   }
   
   console.log('play menu');
