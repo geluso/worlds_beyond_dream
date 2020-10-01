@@ -8,6 +8,7 @@ const app = express();
 let IS_CONTEST_ENABLED = false;
 let CALLER_NUMBER = 0;
 let CALLER_WIN_NUMBER = 5;
+let OPERATOR_NUMBER = '206-659-9994'
 
 // Parse incoming POST params with Express middleware
 app.use(urlencoded({ extended: false }));
@@ -19,6 +20,8 @@ app.get('/see-caller-count', (req, res) => {
   output += '<p>number of calls: ' + CALLER_NUMBER + '</p>'
   output += "<div><form method='POST' action='/reset-callers-to-zero'><button>reset callers to zero</button></form></div>"
   output += "<div><form method='POST' action='/set-caller-winner-number'><label>winning call number: <input type='number' step='1' value='" + CALLER_WIN_NUMBER + "' name='number'/><button>set</button></label></form></div>"
+  output += "<div>operator number:" + OPERATOR_NUMBER + "</div>"
+  output += "<div><form method='POST' action='/set-operator-number'><label>set operator: <input value='" + OPERATOR_NUMBER + "' name='phonenumber'/><button>set</button></label></form></div>"
   res.send(output);
 })
 
@@ -35,6 +38,12 @@ app.post('/reset-callers-to-zero', (req, res) => {
 app.post('/set-caller-winner-number', (req, res) => {
   const number = parseInt(req.body.number)
   setCallerWinnerNumber(number)
+  res.redirect('/see-caller-count')
+})
+
+app.post('/set-operator-number', (req, res) => {
+  const phonenumber = parseInt(req.body.phonenumber)
+  OPERATOR_NUMBER = phonenumber  
   res.redirect('/see-caller-count')
 })
 
@@ -90,7 +99,7 @@ function incrementCallerNumber(twiml) {
   
   if (CALLER_NUMBER === CALLER_WIN_NUMBER) {
     twiml.say('Congratulations! You are lucky caller number ' + CALLER_NUMBER + '. You won!')
-    twiml.dial('206-659-9994')
+    twiml.dial(OPERATOR_NUMBER)
   } else if (CALLER_NUMBER < CALLER_WIN_NUMBER) {
     twiml.say('You are caller number ' + CALLER_NUMBER + '. try calling again!')
   } else {
