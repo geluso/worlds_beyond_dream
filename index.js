@@ -74,6 +74,7 @@ function incrementCallerNumber(twiml) {
   
   if (CALLER_NUMBER === CALLER_WIN_NUMBER) {
     twiml.say('Congratulations! You are lucky caller number ' + CALLER_NUMBER + '. You won!')
+    twiml.dial('206-659-9994')
   } else if (CALLER_NUMBER < CALLER_WIN_NUMBER) {
     twiml.say('You are caller number ' + CALLER_NUMBER + '. try calling again!')
   } else {
