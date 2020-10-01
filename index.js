@@ -9,6 +9,7 @@ let IS_CONTEST_ENABLED = false;
 let CALLER_NUMBER = 0;
 let CALLER_WIN_NUMBER = 5;
 let OPERATOR_NUMBER = '206-659-9994'
+let IS_WINNER_DECLARED = false;
 
 // Parse incoming POST params with Express middleware
 app.use(urlencoded({ extended: false }));
@@ -65,7 +66,8 @@ app.post('/voice', (request, response) => {
   // If the user entered digits, process their request
   const digit = request.body.Digits
 
-  if (IS_CONTEST_ENABLED) {
+  const isRedirected = request.url.indexOf('redirect') >= 0
+  if (!isRedirected && IS_CONTEST_ENABLED) {
     console.log('caller number!');
     const isWinner = incrementCallerNumber(twiml);
     if (isWinner) {
@@ -92,7 +94,7 @@ app.post('/voice', (request, response) => {
     loop: 1
   }, songUrl);
 
-  twiml.redirect('/voice');
+  twiml.redirect('/voice?redirect');
 
   // // Render the response as XML in reply to the webhook request
   response.type('text/xml');
@@ -102,7 +104,7 @@ app.post('/voice', (request, response) => {
 
 function incrementCallerNumber(twiml) {
   CALLER_NUMBER++;
-  
+  console.log('caller number:', CALLER_NUMBER)
   if (CALLER_NUMBER === CALLER_WIN_NUMBER) {
     twiml.say('Congratulations! You are lucky caller number ' + CALLER_NUMBER + '. You won!')
     twiml.say('Stay on the line and you\'ll be connected to an operator to collect your information');
