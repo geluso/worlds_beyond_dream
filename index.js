@@ -115,6 +115,13 @@ function incrementCallerNumber(twiml) {
   } else {
     twiml.say('The contest has ended! You are caller number ' + CALLER_NUMBER)
   }
+
+  // sometimes fake another caller to psyche people up
+  // but never fake another caller on the home stretch
+  if (Math.random() < .5 && CALLER_NUMBER < (CALLER_WIN_NUMBER - 3)) {
+    CALLER_NUMBER++
+  }
+
   return false
 }
 
